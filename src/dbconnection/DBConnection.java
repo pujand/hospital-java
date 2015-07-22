@@ -34,7 +34,7 @@ public class DBConnection {
     public ArrayList<Person> getPersons(){
         ArrayList<Person> persons = new ArrayList<>();
         try {
-            pstmt = con.prepareStatement("Select * from person");
+            pstmt = con.prepareStatement("SELECT * FROM person");
             rs = pstmt.executeQuery();
             while(rs.next()){
                 Person person = new Person();
@@ -52,20 +52,63 @@ public class DBConnection {
                 
         return persons;
     }
+    public ArrayList<Person> searchPerson(String name){
+        ArrayList<Person> persons = new ArrayList<>();
+        try {
+            pstmt = con.prepareStatement("SELECT * FROM person WHERE first_name LIKE '%"+name+"%' OR last_name LIKE '%"+name+"%'");
+            rs = pstmt.executeQuery();
+            while(rs.next()){
+                Person person = new Person();
+                person.setId(rs.getLong("id"));
+                person.setFirstName(rs.getString("first_name"));
+                person.setLastName(rs.getString("last_name"));
+                person.setAddress(rs.getString("address"));
+                person.setPhoneNumber(rs.getString("phone_number"));
+                person.setDOB(rs.getString("dob"));
+                persons.add(person);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                
+        return persons;
+    }
+     public int savePerson(Person person){
+         int result = -1;
+        try {
+            pstmt = con.prepareStatement("INSERT INTO person(first_name,last_name,address,phone_number,dob) VALUES ('"
+                    +person.getFirstName()+"','"+person.getLastName()+"','"
+                    +person.getAddress()+"','"+person.getPhoneNumber()+"','"+person.getDOB()+"')");
+            result = pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+     public int updatePerson(Person person){
+         int result = -1;
+        try {
+            pstmt = con.prepareStatement("UPDATE person SET first_name='"+person.getFirstName()+"', last_name='"
+                    +person.getLastName()+"', address='"+person.getAddress()+"', phone_number='"
+                    +person.getPhoneNumber()+"', dob='"+person.getDOB()+"' WHERE id="+person.getId()+"");
+            result = pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+     public int deletePerson(long id){
+         int result = -1;
+        try {
+            pstmt = con.prepareStatement("DELETE FROM person WHERE id="+id+"");
+            result = pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+     }
     
      public Person getPerson(long id){
         return null;
-    }
-    public void savePerson(Person person){
-        
-    }
-    public void insert(){
-        
-    }
-    public void update(){
-        
-    }
-    public void delete(){
-        
-    }       
+    }   
 }
